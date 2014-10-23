@@ -10,8 +10,8 @@ int RCLK_Pin = 9;  //pin 12 on the 75HC595
 int SRCLK_Pin = 10; //pin 11 on the 75HC595
 int counter = 0;
 
-// 1001 0110 0000 0110
-char a[] = {9, 6, 0, 6};
+// 0110 1001 1111 1001
+char a[] = {6, 9, 15, 9};
 
 //How many of the shift registers - change this
 #define number_of_74hc595s 1 
@@ -28,7 +28,6 @@ void col(int i);
 
 void setup()
 {
-	a[0] = a[0] >> 4;
 	pinMode(SER_Pin, OUTPUT);
 	pinMode(RCLK_Pin, OUTPUT);
 	pinMode(SRCLK_Pin, OUTPUT);
@@ -79,7 +78,7 @@ void loop()
 
 	for (int i = 0; i < 4; ++i)
 	{
-		if (a[counter] & 1 << i) col(i);
+		if (!(a[counter] & 1 << i)) col(i);
 	}
 
 	writeRegisters();
