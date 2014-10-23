@@ -28,6 +28,10 @@ void col(int i);
 
 void setup()
 {
+/*	for (int i = 0; i < 4; ++i)
+	{
+		a[i] = a[i] >> 4;
+	}*/
 	pinMode(SER_Pin, OUTPUT);
 	pinMode(RCLK_Pin, OUTPUT);
 	pinMode(SRCLK_Pin, OUTPUT);
@@ -68,6 +72,7 @@ void setRegisterPin(int index, int value)
 	registers[index] = value;
 }
 
+int anime = 0;	
 void loop()
 {
 	clearRegisters();
@@ -75,6 +80,17 @@ void loop()
 
 	if (counter == 4) counter = 0;
 	row(counter);
+
+/*	if (anime % 100 == 0)
+	{
+		Serial.println("Animation");
+		for (int i = 0; i < 4; ++i)
+		{
+			a[i] = a[i] << 1;
+		}
+		
+	}
+	anime++;*/
 
 	for (int i = 0; i < 4; ++i)
 	{
