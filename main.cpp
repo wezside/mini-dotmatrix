@@ -1,9 +1,17 @@
+/**
+ * @author wezside
+ * Based on the code from Bildr (http://bildr.org/2011/02/74hc595/)
+ */
+
 #include "Arduino.h"
 
 int SER_Pin = 8;   //pin 14 on the 75HC595
 int RCLK_Pin = 9;  //pin 12 on the 75HC595
 int SRCLK_Pin = 10; //pin 11 on the 75HC595
 int counter = 0;
+
+// 1001 0110 0000 0110
+char a[] = {9, 6, 0, 6};
 
 //How many of the shift registers - change this
 #define number_of_74hc595s 1 
@@ -20,6 +28,7 @@ void col(int i);
 
 void setup()
 {
+	a[0] = a[0] >> 4;
 	pinMode(SER_Pin, OUTPUT);
 	pinMode(RCLK_Pin, OUTPUT);
 	pinMode(SRCLK_Pin, OUTPUT);
@@ -47,9 +56,7 @@ void writeRegisters()
 	for(int i = numOfRegisterPins - 1; i >=  0; i--)
 	{
 		digitalWrite(SRCLK_Pin, LOW);
-
 		int val = registers[i];
-
 		digitalWrite(SER_Pin, val);
 		digitalWrite(SRCLK_Pin, HIGH);
 
@@ -62,8 +69,6 @@ void setRegisterPin(int index, int value)
 	registers[index] = value;
 }
 
-int a[] = {1, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0};
-
 void loop()
 {
 	clearRegisters();
@@ -72,9 +77,9 @@ void loop()
 	if (counter == 4) counter = 0;
 	row(counter);
 
-	for (int i = counter * 4; i < counter * 4 + 4; ++i)
+	for (int i = 0; i < 4; ++i)
 	{
-		if (a[i] == 1) col(i - counter * 4);
+		if (a[counter] & 1 << i) col(i);
 	}
 
 	writeRegisters();
