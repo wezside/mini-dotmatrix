@@ -12,7 +12,7 @@
 #define numOfRegisterPins number_of_74hc595s * 8
 
 // Lower will be faster must be larger than 0
-#define SPEED 30
+#define SPEED 80
 
 int SER_Pin = 8;   //pin 14 on the 75HC595
 int RCLK_Pin = 9;  //pin 12 on the 75HC595
@@ -20,12 +20,18 @@ int SRCLK_Pin = 10; //pin 11 on the 75HC595
 
 int anime = 0;	
 int counter = 0;
-int shift_right_counter = 4;
-int shift_left_counter = 0;
+int shift_right_counter = 8;
 
-// 0110 1001 1111 1001
-char a[] = {0, 0, 0, 0};
-char a_copy[] = {6, 9, 15, 9};
+char in[] = {0, 0, 0, 0};
+char out[] = {0, 0, 0, 0,
+			  0, 0, 0, 0,
+			  0, 0, 0, 0};
+
+// A: 0110 1001 1111 1001 
+// b: 0100 0111 0101 0111 
+char chars[] = {6, 9, 15, 9, 
+				4, 7, 5, 7};
+int char_index = 0;
 
 // Registers or Shift register pins
 boolean registers[numOfRegisterPins];
@@ -94,6 +100,15 @@ void loop()
 	clearRegisters();
 	writeRegisters();
 
+	if (shift_right_counter == -1)
+	{
+		for (int i = 0; i < 4; ++i)
+		{
+			in[i] = out[i] | (chars[char_index * 4 + i] << 3);
+		}	
+		// shift_right_counter = 12;
+	}
+
 	// Wrap around for row counter
 	if (counter == 4) counter = 0;
 
@@ -106,28 +121,19 @@ void loop()
 		// For each of the rows
 		for (int i = 0; i < 4; ++i)
 		{
-			a[i] = a_copy[i] >> shift_right_counter;
+			out[i] = in[i] >> shift_right_counter;
 		}		
 		shift_right_counter--;
+		Serial.println(shift_right_counter, DEC);
 	}
-
-	// Animate out (right to left)
-	if (anime % SPEED == 0 && shift_left_counter <= 4 && shift_right_counter == -1)
-	{
-		// For each of the rows
-		for (int i = 0; i < 4; ++i)
-		{
-			a[i] = a_copy[i] << shift_left_counter;
-		}		
-		shift_left_counter++;
-	}
+	else if (shift_right_counter == -1) shift_right_counter = 8;
 
 	// Animation frame counter
 	anime++;
 
 	for (int i = 0; i < 4; ++i)
 	{
-		if (!(a[counter] & 1 << i)) col(i);
+		if (!(out[counter] & 1 << i)) col(i);
 	}
 	writeRegisters();
 	delay(5);  
