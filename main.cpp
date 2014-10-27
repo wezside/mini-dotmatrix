@@ -11,6 +11,7 @@
 //do not touch
 #define numOfRegisterPins number_of_74hc595s * 8
 
+// Lower will be faster must be larger than 0
 #define SPEED 30
 
 int SER_Pin = 8;   //pin 14 on the 75HC595
@@ -78,6 +79,16 @@ void setRegisterPin(int index, int value)
 	registers[index] = value;
 }
 
+void row(int i)
+{
+	setRegisterPin(i, HIGH);  
+}
+
+void col(int i)
+{
+	setRegisterPin(i + 4, HIGH);
+}	
+
 void loop()
 {
 	clearRegisters();
@@ -124,13 +135,3 @@ void loop()
 	if (counter < 4) counter ++;
 	else counter = 0;
 }
-
-void row(int i)
-{
-	setRegisterPin(i, HIGH);  
-}
-
-void col(int i)
-{
-	setRegisterPin(i + 4, HIGH);
-}	
